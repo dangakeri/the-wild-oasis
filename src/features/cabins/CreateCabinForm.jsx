@@ -9,7 +9,7 @@ import FormRow from "../../ui/FormRow";
 import { useCreateCabin } from "./useCreateCabin";
 import { useEditCabin } from "./useEditCabin";
 
-function CreateCabinForm({ cabinToEdit = null }) {
+function CreateCabinForm({ cabinToEdit = null, onCloseModal }) {
   // Safe access for create vs edit
   const editId = cabinToEdit?.id ?? null;
   const isEditSession = Boolean(editId);
@@ -17,21 +17,21 @@ function CreateCabinForm({ cabinToEdit = null }) {
   const { register, handleSubmit, reset, getValues, formState } = useForm({
     defaultValues: isEditSession
       ? {
-        ...cabinToEdit,
-        // don't preload file inputs
-        image: undefined,
-      }
+          ...cabinToEdit,
+          // don't preload file inputs
+          image: undefined,
+        }
       : {
-        // sensible create defaults
-        discount: 0,
-        description: "",
-      },
+          // sensible create defaults
+          discount: 0,
+          description: "",
+        },
   });
 
   const { errors } = formState;
 
-  const { isCreating, createCabin } = useCreateCabin()
-  const { isEditing, editCabin } = useEditCabin
+  const { isCreating, createCabin } = useCreateCabin();
+  const { isEditing, editCabin } = useEditCabin;
 
   const isWorking = isCreating || isEditing;
 
@@ -56,14 +56,27 @@ function CreateCabinForm({ cabinToEdit = null }) {
     else delete payload.image;
 
     if (isEditSession) {
-      editCabin({ id: editId, data: payload }, { onSuccess: (data) => reset() });
+      editCabin(
+        { id: editId, data: payload },
+        {
+          onSuccess: (data) => {
+            reset();
+            onCloseModal?.();
+          },
+        }
+      );
     } else {
-      createCabin(payload, { onSuccess: (data) => reset() });
+      createCabin(payload, {
+        onSuccess: (data) => {
+          reset();
+          onCloseModal?.();
+        },
+      });
     }
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(onSubmit)} type={onCloseModal ? "modal" : "regular"}>
       <FormRow label="Cabin name" error={errors.name?.message}>
         <Input
           type="text"
@@ -135,7 +148,11 @@ function CreateCabinForm({ cabinToEdit = null }) {
       </FormRow>
 
       <FormRow>
-        <Button variation="secondary" type="reset" disabled={isWorking}>
+        <Button
+          variation="secondary"
+          type="reset"
+          onClick={() => onCloseModal?.()}
+        >
           Cancel
         </Button>
         <Button disabled={isWorking}>
