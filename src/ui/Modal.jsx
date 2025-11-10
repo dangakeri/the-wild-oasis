@@ -71,11 +71,11 @@ function Open({ children, opens: opensWindowName }) {
 function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
 
-  useOutsideClick(close);
+  const ref = useOutsideClick(close);
   if (name !== openName) return null;
   return createPortal(
     <Overlay>
-      <StyledModal>
+      <StyledModal ref={ref}>
         <Button onClick={close}>
           <HiXMark />
         </Button>
@@ -85,7 +85,7 @@ function Window({ children, name }) {
     document.body
   );
 }
-Modal.open = Open;
+Modal.Open = Open;
 Modal.Window = Window;
 
 export default Modal;
