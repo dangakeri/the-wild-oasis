@@ -6,13 +6,12 @@ import Heading from "../../ui/Heading";
 import ButtonGroup from "../../ui/ButtonGroup";
 import Button from "../../ui/Button";
 import ButtonText from "../../ui/ButtonText";
+import Spinner from "../../ui/Spinner";
 
 import { useMoveBack } from "../../hooks/useMoveBack";
-
-import Spinner from "../../ui/Spinner";
+import { useBooking } from "../bookings/useBooking";
 import { useEffect, useState } from "react";
 import Checkbox from "../../ui/Checkbox";
-import { useBooking } from "../bookings/useBooking";
 import { formatCurrency } from "../../utils/helpers";
 import { useCheckin } from "./useCheckin";
 import { useSettings } from "../settings/useSettings";
@@ -29,11 +28,14 @@ function CheckinBooking() {
   const [confirmPaid, setConfirmPaid] = useState(false);
   const [addBreakfast, setAddBreakfast] = useState(false);
   const { booking, isLoading } = useBooking();
-  const { settings, isLoading: settingsLoading } = useSettings();
-  const { checkin, isCheckingIn } = useCheckin();
-  console.log(booking);
+  const { settings, isLoading: isLoadingSettings } = useSettings();
+
   useEffect(() => setConfirmPaid(booking?.isPaid ?? false), [booking]);
+
   const moveBack = useMoveBack();
+  const { checkin, isCheckingIn } = useCheckin();
+
+  if (isLoading || isLoadingSettings) return <Spinner />;
 
   const {
     id: bookingId,
@@ -43,11 +45,13 @@ function CheckinBooking() {
     hasBreakfast,
     numNights,
   } = booking;
+
   const optionalBreakfastPrice =
-    settings?.breakfastPrice * numNights * numGuests;
+    settings.breakfastPrice * numNights * numGuests;
 
   function handleCheckin() {
     if (!confirmPaid) return;
+
     if (addBreakfast) {
       checkin({
         bookingId,
@@ -61,7 +65,7 @@ function CheckinBooking() {
       checkin({ bookingId, breakfast: {} });
     }
   }
-  if (isLoading || settingsLoading) return <Spinner />;
+
   return (
     <>
       <Row type="horizontal">
@@ -70,6 +74,7 @@ function CheckinBooking() {
       </Row>
 
       <BookingDataBox booking={booking} />
+
       {!hasBreakfast && (
         <Box>
           <Checkbox
@@ -89,14 +94,17 @@ function CheckinBooking() {
         <Checkbox
           checked={confirmPaid}
           onChange={() => setConfirmPaid((confirm) => !confirm)}
-          id="confirm"
           disabled={confirmPaid || isCheckingIn}
+          id="confirm"
         >
-          I confirm that {guests?.fullName} has paid the total amount{" "}
+          I confirm that {guests.fullName} has paid the total amount of{" "}
           {!addBreakfast
             ? formatCurrency(totalPrice)
-            : formatCurrency(totalPrice + optionalBreakfastPrice)}
-          .
+            : `${formatCurrency(
+                totalPrice + optionalBreakfastPrice
+              )} (${formatCurrency(totalPrice)} + ${formatCurrency(
+                optionalBreakfastPrice
+              )})`}
         </Checkbox>
       </Box>
 

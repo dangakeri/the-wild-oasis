@@ -1,6 +1,5 @@
 import styled from "styled-components";
 
-
 const StyledFormRow = styled.div`
   display: grid;
   align-items: center;
@@ -36,12 +35,15 @@ const Error = styled.span`
   font-size: 1.4rem;
   color: var(--color-red-700);
 `;
-function FormRow({label,error,children}) {
-  return   <StyledFormRow>
-       {label&& <Label htmlFor={children.props.id}>{label}</Label>}
-        {children}
-        {error && <Error>{error}</Error>}
-      </StyledFormRow>
+
+function FormRow({ label, error, children }) {
+  return (
+    <StyledFormRow>
+      {label && <Label htmlFor={children.props.id}>{label}</Label>}
+      {children}
+      {error && <Error>{error}</Error>}
+    </StyledFormRow>
+  );
 }
 
 export default FormRow;

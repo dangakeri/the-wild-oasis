@@ -64,14 +64,16 @@ const StyledButton = styled.button`
     transition: all 0.3s;
   }
 `;
+
 const MenusContext = createContext();
 
 function Menus({ children }) {
-  const [openId, setOpenId] = useState();
+  const [openId, setOpenId] = useState("");
   const [position, setPosition] = useState(null);
 
   const close = () => setOpenId("");
   const open = setOpenId;
+
   return (
     <MenusContext.Provider
       value={{ openId, close, open, position, setPosition }}
@@ -83,9 +85,11 @@ function Menus({ children }) {
 
 function Toggle({ id }) {
   const { openId, close, open, setPosition } = useContext(MenusContext);
-  function handleClick(e) {
-    const rect = e.target.closest("button").getBoundingClientRect();
 
+  function handleClick(e) {
+    e.stopPropagation();
+
+    const rect = e.target.closest("button").getBoundingClientRect();
     setPosition({
       x: window.innerWidth - rect.width - rect.x,
       y: rect.y + rect.height + 8,
@@ -96,13 +100,14 @@ function Toggle({ id }) {
 
   return (
     <StyledToggle onClick={handleClick}>
-      <HiEllipsisVertical style={{ color: "#000" }} />
+      <HiEllipsisVertical />
     </StyledToggle>
   );
 }
+
 function List({ id, children }) {
   const { openId, position, close } = useContext(MenusContext);
-  const ref = useOutsideClick(close);
+  const ref = useOutsideClick(close, false);
 
   if (openId !== id) return null;
 
@@ -113,6 +118,7 @@ function List({ id, children }) {
     document.body
   );
 }
+
 function Button({ children, icon, onClick }) {
   const { close } = useContext(MenusContext);
 
@@ -120,6 +126,7 @@ function Button({ children, icon, onClick }) {
     onClick?.();
     close();
   }
+
   return (
     <li>
       <StyledButton onClick={handleClick}>
@@ -129,6 +136,7 @@ function Button({ children, icon, onClick }) {
     </li>
   );
 }
+
 Menus.Menu = Menu;
 Menus.Toggle = Toggle;
 Menus.List = List;

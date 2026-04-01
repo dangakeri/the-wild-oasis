@@ -52,6 +52,7 @@ const StyledNavLink = styled(NavLink)`
     color: var(--color-brand-600);
   }
 `;
+
 function MainNav() {
   return (
     <nav>
@@ -61,25 +62,25 @@ function MainNav() {
             <HiOutlineHome />
             <span>Home</span>
           </StyledNavLink>
-        </li>{" "}
+        </li>
         <li>
           <StyledNavLink to="/bookings">
             <HiOutlineCalendarDays />
             <span>Bookings</span>
           </StyledNavLink>
-        </li>{" "}
+        </li>
         <li>
           <StyledNavLink to="/cabins">
             <HiOutlineHomeModern />
             <span>Cabins</span>
           </StyledNavLink>
-        </li>{" "}
+        </li>
         <li>
           <StyledNavLink to="/users">
             <HiOutlineUsers />
             <span>Users</span>
           </StyledNavLink>
-        </li>{" "}
+        </li>
         <li>
           <StyledNavLink to="/settings">
             <HiOutlineCog6Tooth />
